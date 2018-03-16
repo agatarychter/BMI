@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">BMI</string>
+    <string name="author">About author</string>
+    <string name="count">Count</string>
+    <string name="other_units">Other units</string>
+    <string name="bmi">Your BMI is:</string>
+    <string name="your_bmi_is">Your BMI: </string>
+    <string name="change_units">Change units</string>
+    <string name="save_icon">save icon</string>
+    <string name="mass">Mass</string>
+    <string name="height">Height</string>
+    <string name="lb_inch">lb/inch</string>
+    <string name="kg_m">kg/m</string>
+    <string name="my_description">My name is Agata.\nI love pandas and food</string>
+    <string name="no_data">No data passed</string>
+    <string name="wrong_data">Wrong both inputs</string>
+    <string name="save_info">Your data has been saved</string>
+    <string name="enter_data">Enter proper data</string>
+    <string name="panda">panda</string>
+    <string name="title_activity_author">Author</string>
+    <string name="wrong_mass">Wrong mass</string>
+    <string name="wrong_height">Wrong height</string>
+</resources>
