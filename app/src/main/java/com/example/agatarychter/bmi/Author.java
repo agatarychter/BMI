@@ -86,13 +86,9 @@ public class Author extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_author);
-
+        initViews();
         mVisible = true;
-        mControlsView = findViewById(R.id.fullscreen_content_controls);
-        mContentView = findViewById(R.id.fullscreen_content);
-
         ActionBar actionBar =getSupportActionBar();
         if(actionBar!=null)
             actionBar.setTitle(R.string.app_name);
@@ -109,6 +105,11 @@ public class Author extends AppCompatActivity {
         // while interacting with the UI.
     }
 
+    private void initViews()
+    {
+        mControlsView = findViewById(R.id.fullscreen_content_controls);
+        mContentView = findViewById(R.id.fullscreen_content);
+    }
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);

@@ -5,6 +5,8 @@ package com.example.agatarychter.bmi;
  */
 
 public abstract class BMICounter {
+    private static final double MIN_BMI = 18;
+    private static final double MAX_BMI = 25;
 
     protected static class WrongDataException extends Exception{
         public WrongDataException(){
@@ -52,5 +54,19 @@ public abstract class BMICounter {
     }
 
     public abstract double calculateBMI() throws WrongDataException;
+
+    public static int returnColorDependingOnBMI(double bmi)
+    {
+        if(bmi<MIN_BMI)
+        {
+            return R.color.blue;
+        }
+        else if(bmi<=MAX_BMI && bmi>=MIN_BMI)
+        {
+            return R.color.green;
+        }
+        else
+            return R.color.red;
+    }
 
 }

@@ -1,5 +1,4 @@
 package com.example.agatarychter.bmi;
-
 /**
  * Created by Agata Rychter on 10.03.2018.
  */

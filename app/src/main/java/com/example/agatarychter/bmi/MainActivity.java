@@ -15,6 +15,8 @@ import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.Toast;
 
+import static java.security.AccessController.getContext;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -26,71 +28,16 @@ public class MainActivity extends AppCompatActivity {
     private static final String SHARED_PREFERENCES = "My preferences";
     private double mass;
     private double height;
-    public static final String CALCULATED_BMI_TEXT = "Calculated bmi";
     private Switch switchBtn;
+    private Button countButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        massText= (EditText)findViewById(R.id.mass);
-        heightText =(EditText) findViewById(R.id.height);
-        Button countButton = (Button)findViewById(R.id.count_btn);
-
-        switchBtn =(Switch) findViewById(R.id.switch_btn);
+        initViews();
         loadSavedInputs();
-        switchBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                clearData();
-            }
-        });
-        countButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(areInputsEmpty())
-                {
-                    Toast.makeText(getApplicationContext(),getString(R.string.enter_data),Toast.LENGTH_SHORT).show();
-                }
-                else
-                {
-                    mass = Double.parseDouble(massText.getText().toString());
-                    height = Double.parseDouble(heightText.getText().toString());
-                    BMICounter bmiCounter;
-                    if(switchBtn.isChecked())
-                        bmiCounter= new BMIForLbInch(mass,height);
-                    else
-                        bmiCounter = new BMIForKgM(mass,height);
-                    try
-                    {
-                        Intent intent= new Intent(MainActivity.this,ResultActivity.class);
-                        double calculatedBMI = bmiCounter.calculateBMI();
-                        intent.putExtra(CALCULATED_BMI_TEXT,calculatedBMI);
-                        startActivity(intent);
-                    }
-                    catch (BMICounter.WrongMassException e)
-                    {
-                        Toast.makeText(getApplicationContext(),R.string.wrong_mass,Toast.LENGTH_SHORT).show();
-                    }
-                    catch (BMICounter.WrongHeightException e)
-                    {
-                        Toast.makeText(getApplicationContext(),R.string.wrong_height,Toast.LENGTH_SHORT).show();
-
-                    }
-                    catch(BMICounter.WrongBothInputsException e)
-                    {
-                        Toast.makeText(getApplicationContext(),R.string.wrong_data,Toast.LENGTH_SHORT).show();
-
-                    }
-                    catch (BMICounter.WrongDataException e)
-                    {
-                        Toast.makeText(getApplicationContext(),R.string.wrong_data,Toast.LENGTH_SHORT).show();
-                    }
-                }
-            }}
-            );
-
+        initListeners();
     }
 
     @Override
@@ -104,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.about_author:
-                startActivity(new Intent(getApplicationContext(),Author.class));
+                startActivity(new Intent(this,Author.class));
                 return true;
             case R.id.save_icon:
                 saveInputs();
@@ -112,6 +59,86 @@ public class MainActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void initViews()
+    {
+        massText= (EditText)findViewById(R.id.mass);
+        heightText =(EditText) findViewById(R.id.height);
+        countButton = (Button)findViewById(R.id.count_btn);
+        switchBtn =(Switch) findViewById(R.id.switch_btn);
+    }
+
+    private void initListeners()
+    {
+        switchBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                clearData();
+            }
+        });
+
+        countButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onCountButtonClick();
+            }}
+        );
+
+    }
+
+    private void onCountButtonClick()
+    {
+        if(areInputsEmpty())
+        {
+            Toast.makeText(getApplicationContext(),getString(R.string.enter_data),Toast.LENGTH_SHORT).show();
+        }
+        else
+        {
+            boolean notParsebleString = false;
+            try
+            {
+                mass = Double.parseDouble(massText.getText().toString());
+                height = Double.parseDouble(heightText.getText().toString());
+            }
+            catch(NumberFormatException e)
+            {
+                notParsebleString = true;
+            }
+            if(notParsebleString)
+            {
+                Toast.makeText(getApplicationContext(),getString(R.string.wrong_data),Toast.LENGTH_SHORT).show();
+            }
+            else
+            {
+                BMICounter bmiCounter;
+                if(switchBtn.isChecked())
+                    bmiCounter= new BMIForLbInch(mass,height);
+                else
+                    bmiCounter = new BMIForKgM(mass,height);
+                try
+                {
+                    double calculatedBMI = bmiCounter.calculateBMI();
+                    ResultActivity.start(this,calculatedBMI);
+                }
+
+                catch (BMICounter.WrongDataException e)
+                {
+                    chooseException(e);
+                }
+            }
+        }
+    }
+
+    private void chooseException(BMICounter.WrongDataException e) {
+        if(e.getClass().equals(BMICounter.WrongMassException.class))
+            Toast.makeText(getApplicationContext(),R.string.wrong_mass,Toast.LENGTH_SHORT).show();
+        else if (e.getClass().equals(BMICounter.WrongHeightException.class))
+            Toast.makeText(getApplicationContext(),R.string.wrong_height,Toast.LENGTH_SHORT).show();
+        else if(e.getClass().equals(BMICounter.WrongBothInputsException.class))
+            Toast.makeText(getApplicationContext(),R.string.wrong_data,Toast.LENGTH_SHORT).show();
+        else
+            Toast.makeText(getApplicationContext(),R.string.wrong_data,Toast.LENGTH_SHORT).show();
     }
 
     private void saveInputs()
